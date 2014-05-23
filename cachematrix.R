@@ -4,15 +4,20 @@
 ## This function creates a special "matrix" object that can cache its inverse.
 
 makeCacheMatrix <- function(x = matrix()) {
-        m <- NULL
-        set <- function(y) {
+        inv <- NULL                                      ## initialize inverse result variable
+        
+        set <- function(y) {                             ## define set matrix function
                 x <<- y
-                m <<- NULL
+                inv <<- NULL
         }
-        get <- function() x
-        setinverse <- function(solve) m <<- solve
-        getinverse <- function() m
-        list(set = set, get = get,
+        
+        get <- function() x                              ## define get matrix function
+        
+        setinverse <- function(inverse) inv <<- inverse  ## define set inverse function
+        
+        getinverse <- function() inv                     ## define get inverse function
+        
+        list(set = set, get = get,                       ## create special "matrix" using a list
              setinverse = setinverse,
              getinverse = getinverse)
 }
@@ -21,13 +26,18 @@ makeCacheMatrix <- function(x = matrix()) {
 ## This function computes the inverse of the special "matrix" returned by function makeCacheMatrix.
 
 cacheSolve <- function(x, ...) {
-        m <- x$getinverse()
-        if(!is.null(m)) {
-                message("getting cached data")
-                return(m)
+        inv <- x$getinverse()                   ## retrieve previously calculated inverse
+        
+        if (!is.null(inv)) {
+                message("getting cached data")  ## stored inverse was found so return value and leave function
+                return(inv)
         }
-        data <- x$get()
-        m <- solve(data, ...)
-        x$setinverse(m)
-        m
+        
+        data <- x$get()                         ## retrieve matrix
+        
+        inv <- solve(data, ...)                 ## calculate inverse of matrix
+        
+        x$setinverse(inv)                       ## store inverse in special "matrix"
+        
+        inv                                     ## return inverse to calling routine
 }
